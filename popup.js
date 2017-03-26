@@ -1,5 +1,6 @@
 'use strict';
 document.addEventListener('DOMContentLoaded', function () {
+	var options = {};
 	function clickHandler(arg) {
 		return function () {
 			chrome.tabs.query({
@@ -13,15 +14,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		};
 	}
-
+	function getOptions() {
+		chrome.storage.sync.get({
+			emotesSize: 'small',
+			numberOfEmotes: 10
+		}, function (items) {
+			options = Object.assign({}, items);
+		});
+	}
 	function generatePopUp() {
 		if (xmlHttp.readyState !== 4 || xmlHttp.status !== 200) {
 			var error = document.createTextNode("Can't get emotes list");
 			document.body.appendChild(error);
 			return;
 		}
+
 		var json = JSON.parse(xmlHttp.responseText);
-		var template = json.template.small;
+		var template = json.template[options.emotesSize];
 		var table = document.createElement('table');
 		var row = document.createElement('tr');
 		var i = 0;
@@ -30,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			var cell = document.createElement('td');
 			var emote = json.emotes[emoteName];
 			var emoteInput = document.createElement('input');
-			if (i % 10 === 0) {
+			if (i % options.numberOfEmotes === 0) {
 				table.appendChild(row);
 				row = document.createElement('tr');
 			}
@@ -43,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 		document.body.appendChild(table);
 	}
-
+	getOptions();
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onload = generatePopUp;
 	xmlHttp.open("GET", "https://twitchemotes.com/api_cache/v2/global.json", true);

@@ -10,8 +10,13 @@
   },
    "permissions": [
     "activeTab",
+	"storage",
     "tabs", "https://www.facebook.com/*"
   ],
+  "options_ui": {
+    "page": "options.html",
+    "chrome_style": true
+  },
   "content_scripts": [
    {
      "matches": ["https://www.facebook.com/*"],
